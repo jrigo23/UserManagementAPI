@@ -1,0 +1,134 @@
+@UserManagementAPI_HostAddress = http://localhost:5048
+@token = YOUR_TOKEN_HERE
+
+###############################################
+# TEST SUITE FOR API VALIDATION
+###############################################
+
+### TEST 1: Login with valid credentials (SHOULD RETURN 200 + TOKEN)
+POST {{UserManagementAPI_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "password123"
+}
+
+###
+
+### TEST 2: Login with invalid credentials (SHOULD RETURN 401)
+POST {{UserManagementAPI_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "wrongpassword"
+}
+
+###
+
+### TEST 3: Access protected endpoint WITHOUT token (SHOULD RETURN 401)
+GET {{UserManagementAPI_HostAddress}}/api/users
+Accept: application/json
+
+###
+
+### TEST 4: Access protected endpoint WITH INVALID token (SHOULD RETURN 401)
+GET {{UserManagementAPI_HostAddress}}/api/users
+Accept: application/json
+Authorization: Bearer invalid.token.here
+
+###
+
+### TEST 5: Get all users WITH VALID TOKEN (SHOULD RETURN 200 + DATA)
+GET {{UserManagementAPI_HostAddress}}/api/users
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+### TEST 6: Get user by ID WITH VALID TOKEN (SHOULD RETURN 200 + USER)
+GET {{UserManagementAPI_HostAddress}}/api/users/1
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+### TEST 7: Get non-existent user (SHOULD RETURN 404 + ERROR RESPONSE)
+GET {{UserManagementAPI_HostAddress}}/api/users/999
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
+
+### TEST 8: Create user with INVALID NAME - only 1 word (SHOULD RETURN 400)
+POST {{UserManagementAPI_HostAddress}}/api/users
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "John",
+  "status": "Active"
+}
+
+###
+
+### TEST 9: Create user with valid data (SHOULD RETURN 201 + USER with Status=Inactive)
+POST {{UserManagementAPI_HostAddress}}/api/users
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Alice Marie Johnson",
+  "status": "Active"
+}
+
+###
+
+### TEST 10: Update user with valid token (SHOULD RETURN 200 + UPDATED USER)
+PUT {{UserManagementAPI_HostAddress}}/api/users/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "John Michael Updated",
+  "status": "Active"
+}
+
+###
+
+### TEST 11: Update user with INVALID NAME (SHOULD RETURN 400)
+PUT {{UserManagementAPI_HostAddress}}/api/users/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Jo",
+  "status": "Active"
+}
+
+###
+
+### TEST 12: Update non-existent user (SHOULD RETURN 404)
+PUT {{UserManagementAPI_HostAddress}}/api/users/999
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Test User Name",
+  "status": "Active"
+}
+
+###
+
+### TEST 13: Delete user with valid token (SHOULD RETURN 204)
+DELETE {{UserManagementAPI_HostAddress}}/api/users/2
+Authorization: Bearer {{token}}
+
+###
+
+### TEST 14: Delete non-existent user (SHOULD RETURN 404)
+DELETE {{UserManagementAPI_HostAddress}}/api/users/999
+Authorization: Bearer {{token}}
+
+###
