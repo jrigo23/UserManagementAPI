@@ -9,6 +9,7 @@ A RESTful API built with ASP.NET Core (.NET 10.0) for managing user records with
 - ✅ **Input Validation** - Name validation requiring at least 3 words
 - 📝 **Request/Response Logging** - Custom middleware for logging all API requests
 - 🛡️ **Global Exception Handling** - Standardized error responses across all endpoints
+- 📖 **OpenAPI/Swagger Documentation** - Interactive API documentation with Swagger UI
 - 🚀 **Minimal API** - Built with .NET Minimal API architecture
 
 ## Technologies
@@ -16,6 +17,7 @@ A RESTful API built with ASP.NET Core (.NET 10.0) for managing user records with
 - **.NET 10.0**
 - **ASP.NET Core**
 - **JWT Bearer Authentication**
+- **Swashbuckle.AspNetCore** - OpenAPI/Swagger documentation
 - **C#**
 
 ## Getting Started
@@ -49,6 +51,32 @@ dotnet run
 ```
 
 The API will start and be available at `https://localhost:5001` (or the port specified in your launch settings).
+
+## API Documentation
+
+The API includes interactive **Swagger/OpenAPI documentation** that is automatically generated and available when you run the application.
+
+### Accessing Swagger UI
+
+Once the application is running, navigate to:
+- **Swagger UI**: `http://localhost:5048/` or `http://localhost:5048/index.html`
+- **OpenAPI JSON**: `http://localhost:5048/swagger/v1/swagger.json`
+
+The Swagger UI provides:
+- 📖 Complete API documentation with descriptions for all endpoints
+- 🧪 Interactive testing - try out API calls directly from the browser
+- 🔐 JWT authentication support - use the "Authorize" button to add your JWT token
+- 📝 Request/response examples and schemas
+- 🏷️ Organized endpoints by tags (Authentication, Users)
+
+### Using Authentication in Swagger UI
+
+1. Call the `/api/auth/login` endpoint with the default credentials (username: `admin`, password: `password123`)
+2. Copy the JWT token from the response
+3. Click the "Authorize" button at the top of the Swagger UI
+4. Paste the token in the "Value" field
+5. Click "Authorize" and then "Close"
+6. You can now test authenticated endpoints
 
 ## API Endpoints
 
