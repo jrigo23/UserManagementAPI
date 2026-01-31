@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -29,7 +30,44 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
+// Add OpenAPI/Swagger services
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = "v1",
+        Title = "User Management API",
+        Description = "A RESTful API for managing user records with JWT authentication",
+        Contact = new OpenApiContact
+        {
+            Name = "jrigo23",
+            Url = new Uri("https://github.com/jrigo23/UserManagementAPI")
+        }
+    });
+
+    // Add JWT authentication to Swagger
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
+    });
+});
+
 var app = builder.Build();
+
+// Enable Swagger middleware
+app.UseSwagger();
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "User Management API v1");
+    options.RoutePrefix = string.Empty; // Serve Swagger UI at the app's root
+    options.DocumentTitle = "User Management API - Swagger UI";
+});
 
 // 1. Global exception handling middleware (FIRST - catches all errors)
 app.Use(async (context, next) =>
@@ -122,6 +160,9 @@ app.MapPost("/api/auth/login", (LoginDto loginDto) =>
         statusCode: 401);
 })
 .WithName("Login")
+.WithTags("Authentication")
+.WithSummary("Authenticate user and generate JWT token")
+.WithDescription("Authenticates a user with username and password and returns a JWT token for subsequent API requests.")
 .AllowAnonymous();
 
 // GET: Get all users
@@ -130,6 +171,9 @@ app.MapGet("/api/users", () =>
     return Results.Ok(users);
 })
 .WithName("GetAllUsers")
+.WithTags("Users")
+.WithSummary("Get all users")
+.WithDescription("Retrieves a list of all users in the system. Requires authentication.")
 .RequireAuthorization();
 
 // GET: Get user by id
@@ -151,6 +195,9 @@ app.MapGet("/api/users/{id}", (int id) =>
     return Results.Ok(user);
 })
 .WithName("GetUserById")
+.WithTags("Users")
+.WithSummary("Get user by ID")
+.WithDescription("Retrieves a specific user by their ID. Requires authentication.")
 .RequireAuthorization();
 
 // POST: Create a new user
@@ -181,6 +228,9 @@ app.MapPost("/api/users", (UserDto userDto) =>
     return Results.Created($"/api/users/{newUser.Id}", newUser);
 })
 .WithName("CreateUser")
+.WithTags("Users")
+.WithSummary("Create a new user")
+.WithDescription("Creates a new user with the provided information. Name must contain at least 3 words. New users are created with 'Inactive' status. Requires authentication.")
 .RequireAuthorization();
 
 // PUT: Update an existing user
@@ -220,6 +270,9 @@ app.MapPut("/api/users/{id}", (int id, UserDto userDto) =>
     return Results.Ok(user);
 })
 .WithName("UpdateUser")
+.WithTags("Users")
+.WithSummary("Update an existing user")
+.WithDescription("Updates an existing user's information. Name must contain at least 3 words. Requires authentication.")
 .RequireAuthorization();
 
 // DELETE: Delete a user
@@ -243,6 +296,9 @@ app.MapDelete("/api/users/{id}", (int id) =>
     return Results.NoContent();
 })
 .WithName("DeleteUser")
+.WithTags("Users")
+.WithSummary("Delete a user")
+.WithDescription("Deletes a user from the system. Requires authentication.")
 .RequireAuthorization();
 
 app.Run();
